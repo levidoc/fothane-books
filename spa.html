@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prestige Auto Spa</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-bg': '#0A0A0A',
+                        'brand-card': '#1A1A1A',
+                        'brand-border': '#2A2A2A',
+                        'brand-text': '#F5F5F5',
+                        'brand-mute': '#999999',
+                        'brand-gold': '#C9A96E',
+                        'brand-gold-dark': '#A8884E',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        body {
+            background-color: #0A0A0A;
+            color: #F5F5F5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0A0A0A; }
+        ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #C9A96E; }
+
+        .cart-drawer {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cart-drawer.open { transform: translateX(0); }
+
+        .modal-overlay {
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .img-zoom:hover img { transform: scale(1.05); }
+
+        .view { display: block; animation: fadeIn 0.4s ease; }
+        .view-hidden { display: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-blur { backdrop-filter: blur(12px); background: rgba(10,10,10,0.85); }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #C9A96E, #E8D5A3, #C9A96E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gold-btn {
+            background: linear-gradient(135deg, #C9A96E, #A8884E);
+            transition: all 0.3s ease;
+        }
+        .gold-btn:hover {
+            background: linear-gradient(135deg, #E8D5A3, #C9A96E);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(201,169,110,0.3);
+        }
+
+        .service-card {
+            transition: all 0.3s ease;
+            border: 1px solid #2A2A2A;
+        }
+        .service-card:hover {
+            border-color: #C9A96E;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(201,169,110,0.1);
+        }
+
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        .mobile-menu.open { transform: translateX(0); }
+    </style>
+</head>
+
+<body class="font-sans">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-brand-border">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" onclick="navigateTo('home')" class="text-xl font-bold tracking-tight">
+                <span class="gold-gradient">PRESTIGE</span> <span class="text-brand-text">AUTO SPA</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-brand-mute">
+                <a href="#services" class="hover:text-brand-gold transition-colors">Services</a>
+                <a href="#gallery" class="hover:text-brand-gold transition-colors">Gallery</a>
+                <a href="#about" class="hover:text-brand-gold transition-colors">About</a>
+                <a href="#testimonials" class="hover:text-brand-gold transition-colors">Reviews</a>
+                <a href="#" onclick="navigateTo('store')" class="hover:text-brand-gold transition-colors">Shop</a>
+                <a href="#contact" class="hover:text-brand-gold transition-colors">Contact</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <!-- Cart Button -->
+                <button onclick="toggleCart()" class="relative p-2 text-brand-mute hover:text-brand-gold transition-colors">
+                    <i class="fa-solid fa-bag-shopping text-lg"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 w-5 h-5 bg-brand-gold text-brand-bg text-xs font-bold rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-brand-mute hover:text-brand-gold">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed inset-0 z-[60] bg-brand-bg flex flex-col items-center justify-center gap-8">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-brand-mute hover:text-brand-gold">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+        <a href="#services" onclick="toggleMobileMenu()" class="text-2xl font-light text-brand-text hover:text-brand-gold transition-colors">Services</a>
+        <a href="#gallery" onclick="toggleMobileMenu()" class="text-2xl font-light text-brand-text hover:text-brand-gold transition-colors">Gallery</a>
+        <a href="#about" onclick="toggleMobileMenu()" class="text-2xl font-light text-brand-text hover:text-brand-gold transition-colors">About</a>
+        <a href="#testimonials" onclick="toggleMobileMenu()" class="text-2xl font-light text-brand-text hover:text-brand-gold transition-colors">Reviews</a>
+        <a href="#" onclick="navigateTo('store');toggleMobileMenu()" class="text-2xl font-light text-brand-text hover:text-brand-gold transition-colors">Shop</a>
+        <a href="#contact" onclick="toggleMobileMenu()" class="text-2xl font-light text-brand-text hover:text-brand-gold transition-colors">Contact</a>
+    </div>
+
+    <!-- ==================== HOME VIEW ==================== -->
+    <main id="view-home" class="view">
+
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-brand-bg via-transparent to-brand-bg z-10"></div>
+            <div class="absolute inset-0 opacity-20">
+                <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=1920&q=80" alt="Luxury car" class="w-full h-full object-cover">
+            </div>
+            <div class="relative z-20 text-center px-6 max-w-4xl">
+                <p class="text-brand-gold text-sm font-semibold tracking-[0.3em] uppercase mb-6">Premium Detailing & Car Care</p>
+                <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6">
+                    Where <span class="gold-gradient">Luxury</span> Meets Care
+                </h1>
+                <p class="text-brand-mute text-lg md:text-xl max-w-2xl mx-auto mb-10">
+                    Experience the art of automotive perfection. Every wash is a masterpiece, every detail a commitment to excellence.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#services" class="gold-btn px-8 py-4 rounded-full text-brand-bg font-semibold text-sm tracking-wide">
+                        Explore Services
+                    </a>
+                    <a href="#contact" class="px-8 py-4 rounded-full border border-brand-border text-brand-text font-semibold text-sm tracking-wide hover:border-brand-gold transition-colors">
+                        Book Appointment
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-24 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <p class="text-brand-gold text-sm font-semibold tracking-[0.2em] uppercase mb-3">Our Services</p>
+                    <h2 class="text-3xl md:text-5xl font-bold">Tailored Packages</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Essential -->
+                    <div class="service-card bg-brand-card rounded-2xl p-8 flex flex-col">
+                        <div class="w-12 h-12 rounded-full bg-brand-border flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-droplet text-brand-gold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Essential Wash</h3>
+                        <p class="text-brand-mute text-sm mb-6 flex-1">Exterior hand wash, wheel cleaning, tire dressing, and streak-free windows.</p>
+                        <div class="mt-auto">
+                            <span class="text-2xl font-bold text-brand-gold">R150</span>
+                            <p class="text-brand-mute text-xs mt-1">30 minutes</p>
+                        </div>
+                    </div>
+
+                    <!-- Premium -->
+                    <div class="service-card bg-brand-card rounded-2xl p-8 flex flex-col">
+                        <div class="w-12 h-12 rounded-full bg-brand-border flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-star text-brand-gold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Premium Detail</h3>
+                        <p class="text-brand-mute text-sm mb-6 flex-1">Full exterior wash, interior vacuum, dashboard polish, leather conditioning, and air freshening.</p>
+                        <div class="mt-auto">
+                            <span class="text-2xl font-bold text-brand-gold">R350</span>
+                            <p class="text-brand-mute text-xs mt-1">1 hour</p>
+                        </div>
+                    </div>
+
+                    <!-- Prestige -->
+                    <div class="service-card bg-brand-card rounded-2xl p-8 flex flex-col relative overflow-hidden">
+                        <div class="absolute top-4 right-4 bg-brand-gold text-brand-bg text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">Popular</div>
+                        <div class="w-12 h-12 rounded-full bg-brand-border flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-gem text-brand-gold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Prestige Package</h3>
+                        <p class="text-brand-mute text-sm mb-6 flex-1">Complete interior & exterior detail, clay bar treatment, paint sealant, engine bay cleaning.</p>
+                        <div class="mt-auto">
+                            <span class="text-2xl font-bold text-brand-gold">R650</span>
+                            <p class="text-brand-mute text-xs mt-1">2.5 hours</p>
+                        </div>
+                    </div>
+
+                    <!-- Ultimate -->
+                    <div class="service-card bg-brand-card rounded-2xl p-8 flex flex-col">
+                        <div class="w-12 h-12 rounded-full bg-brand-border flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-crown text-brand-gold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Ultimate Spa</h3>
+                        <p class="text-brand-mute text-sm mb-6 flex-1">Full correction polish, ceramic coating, leather restoration, headlight restoration, and VIP lounge access.</p>
+                        <div class="mt-auto">
+                            <span class="text-2xl font-bold text-brand-gold">R1,200</span>
+                            <p class="text-brand-mute text-xs mt-1">4-5 hours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="py-24 px-6 bg-brand-card/30">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <p class="text-brand-gold text-sm font-semibold tracking-[0.2em] uppercase mb-3">Our Work</p>
+                    <h2 class="text-3xl md:text-5xl font-bold">Gallery</h2>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="img-zoom rounded-xl overflow-hidden aspect-square">
+                        <img src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=600&q=80" alt="Car detail" class="w-full h-full object-cover transition-transform duration-500">
+                    </div>
+                    <div class="img-zoom rounded-xl overflow-hidden aspect-square">
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&q=80" alt="Car wash" class="w-full h-full object-cover transition-transform duration-500">
+                    </div>
+                    <div class="img-zoom rounded-xl overflow-hidden aspect-square">
+                        <img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80" alt="Luxury car" class="w-full h-full object-cover transition-transform duration-500">
+                    </div>
+                    <div class="img-zoom rounded-xl overflow-hidden aspect-square">
+                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80" alt="Sports car" class="w-full h-full object-cover transition-transform duration-500">
+                    </div>
+                    <div class="img-zoom rounded-xl overflow-hidden aspect-square">
+                        <img src="https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&q=80" alt="Interior detail" class="w-full h-full object-cover transition-transform duration-500">
+                    </div>
+                    <div class="img-zoom rounded-xl overflow-hidden aspect-square">
+                        <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80" alt="Clean car" class="w-full h-full object-cover transition-transform duration-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-24 px-6">
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <p class="text-brand-gold text-sm font-semibold tracking-[0.2em] uppercase mb-3">About Us</p>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6">Craftsmanship in Every Detail</h2>
+                    <p class="text-brand-mute leading-relaxed mb-6">
+                        Founded with a passion for automotive excellence, Prestige Auto Spa redefines what it means to care for your vehicle. We combine cutting-edge techniques with artisanal attention to detail.
+                    </p>
+                    <p class="text-brand-mute leading-relaxed mb-8">
+                        Our team of certified detailers treats every vehicle as a work of art, using only premium products and proven methods to deliver results that exceed expectations.
+                    </p>
+                    <div class="grid grid-cols-3 gap-6">
+                        <div>
+                            <p class="text-2xl font-bold text-brand-gold">5K+</p>
+                            <p class="text-brand-mute text-xs mt-1">Cars Detailed</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-brand-gold">8+</p>
+                            <p class="text-brand-mute text-xs mt-1">Years Experience</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-brand-gold">4.9</p>
+                            <p class="text-brand-mute text-xs mt-1">Star Rating</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=800&q=80" alt="Car detailing" class="w-full h-full object-cover rounded-2xl">
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section id="testimonials" class="py-24 px-6 bg-brand-card/30">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <p class="text-brand-gold text-sm font-semibold tracking-[0.2em] uppercase mb-3">Testimonials</p>
+                    <h2 class="text-3xl md:text-5xl font-bold">What Our Clients Say</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-brand-card border border-brand-border rounded-2xl p-8">
+                        <div class="flex gap-1 text-brand-gold mb-4">
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                        </div>
+                        <p class="text-brand-mute text-sm leading-relaxed mb-6">"Absolutely phenomenal service. My car looks better than the day I drove it off the lot. The attention to detail is unmatched."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-brand-border flex items-center justify-center">
+                                <span class="text-sm font-bold text-brand-gold">TM</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold">Thabo M.</p>
+                                <p class="text-brand-mute text-xs">BMW 5 Series</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-card border border-brand-border rounded-2xl p-8">
+                        <div class="flex gap-1 text-brand-gold mb-4">
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                        </div>
+                        <p class="text-brand-mute text-sm leading-relaxed mb-6">"I've tried many car washes but nothing compares to Prestige. The ceramic coating they applied still beads water perfectly after 6 months."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-brand-border flex items-center justify-center">
+                                <span class="text-sm font-bold text-brand-gold">SN</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold">Sarah N.</p>
+                                <p class="text-brand-mute text-xs">Mercedes GLC</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-card border border-brand-border rounded-2xl p-8">
+                        <div class="flex gap-1 text-brand-gold mb-4">
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                            <i class="fa-solid fa-star text-sm"></i>
+                        </div>
+                        <p class="text-brand-mute text-sm leading-relaxed mb-6">"The VIP lounge while you wait is a game changer. Premium coffee, Wi-Fi, and your car comes back looking factory fresh. Worth every cent."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-brand-border flex items-center justify-center">
+                                <span class="text-sm font-bold text-brand-gold">KD</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold">Kabelo D.</p>
+                                <p class="text-brand-mute text-xs">Audi Q7</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Store Teaser -->
+        <section class="py-24 px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <p class="text-brand-gold text-sm font-semibold tracking-[0.2em] uppercase mb-3">Premium Products</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6">Shop Our Collection</h2>
+                <p class="text-brand-mute text-lg mb-10 max-w-2xl mx-auto">
+                    Professional-grade detailing products, premium accessories, and care kits — the same products our specialists use.
+                </p>
+                <button onclick="navigateTo('store')" class="gold-btn px-10 py-4 rounded-full text-brand-bg font-semibold text-sm tracking-wide">
+                    Browse Store
+                </button>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 px-6 bg-brand-card/30">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <p class="text-brand-gold text-sm font-semibold tracking-[0.2em] uppercase mb-3">Get In Touch</p>
+                    <h2 class="text-3xl md:text-5xl font-bold">Book Your Visit</h2>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Contact Info -->
+                    <div class="space-y-8">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-card border border-brand-border flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-location-dot text-brand-gold"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Location</h4>
+                                <p class="text-brand-mute text-sm">42 Prestige Boulevard, Sandton<br>Johannesburg, 2196</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-card border border-brand-border flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-clock text-brand-gold"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Hours</h4>
+                                <p class="text-brand-mute text-sm">Mon - Fri: 7:00 AM - 6:00 PM<br>Sat: 8:00 AM - 4:00 PM<br>Sun: Closed</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-card border border-brand-border flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-phone text-brand-gold"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Phone</h4>
+                                <p class="text-brand-mute text-sm">+27 11 234 5678</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-card border border-brand-border flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-envelope text-brand-gold"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-1">Email</h4>
+                                <p class="text-brand-mute text-sm">bookings@prestigeautospa.co.za</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <form onsubmit="handleContact(event)" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" placeholder="First Name" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                            <input type="text" placeholder="Last Name" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                        </div>
+                        <input type="email" placeholder="Email Address" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                        <input type="tel" placeholder="Phone Number" class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                        <select class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                            <option value="">Select Service</option>
+                            <option value="essential">Essential Wash - R150</option>
+                            <option value="premium">Premium Detail - R350</option>
+                            <option value="prestige">Prestige Package - R650</option>
+                            <option value="ultimate">Ultimate Spa - R1,200</option>
+                        </select>
+                        <textarea placeholder="Additional notes or requests..." rows="4" class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors resize-none"></textarea>
+                        <button type="submit" class="gold-btn w-full py-4 rounded-xl text-brand-bg font-semibold text-sm tracking-wide">
+                            Request Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-brand-border py-12 px-6">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="text-center md:text-left">
+                    <p class="text-lg font-bold"><span class="gold-gradient">PRESTIGE</span> AUTO SPA</p>
+                    <p class="text-brand-mute text-xs mt-1">Where Luxury Meets Care</p>
+                </div>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center text-brand-mute hover:text-brand-gold hover:border-brand-gold transition-colors">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center text-brand-mute hover:text-brand-gold hover:border-brand-gold transition-colors">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center text-brand-mute hover:text-brand-gold hover:border-brand-gold transition-colors">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center text-brand-mute hover:text-brand-gold hover:border-brand-gold transition-colors">
+                        <i class="fa-brands fa-whatsapp"></i>
+                    </a>
+                </div>
+                <p class="text-brand-mute text-xs">&copy; 2026 Prestige Auto Spa. All rights reserved.</p>
+            </div>
+        </footer>
+    </main>
+
+    <!-- ==================== STORE VIEW ==================== -->
+    <main id="view-store" class="view-hidden pt-24 pb-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Store Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <button onclick="navigateTo('home')" class="text-brand-mute hover:text-brand-gold text-sm mb-2 inline-flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Home
+                    </button>
+                    <h2 class="text-3xl font-bold">Shop Products</h2>
+                </div>
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="Search products..." oninput="handleSearch(this.value)" class="bg-brand-card border border-brand-border rounded-full px-5 py-2.5 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors w-48 md:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-brand-mute text-xs"></i>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div id="categories-bar" class="flex gap-3 mb-8 overflow-x-auto pb-2">
+                <button onclick="filterCategory('all')" class="cat-btn active px-5 py-2 rounded-full text-sm font-medium border border-brand-border whitespace-nowrap transition-all bg-brand-gold text-brand-bg border-brand-gold">All</button>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="col-span-full text-center py-20 text-brand-mute">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-4 block text-brand-gold"></i>
+                    Loading products...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== PRODUCT DETAIL VIEW ==================== -->
+    <main id="view-product" class="view-hidden pt-24 pb-16 px-6">
+        <div class="max-w-5xl mx-auto">
+            <button onclick="navigateTo('store')" class="text-brand-mute hover:text-brand-gold text-sm mb-8 inline-flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Back to Store
+            </button>
+            <div id="product-detail" class="grid md:grid-cols-2 gap-12"></div>
+        </div>
+    </main>
+
+    <!-- ==================== CART DRAWER ==================== -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/60 z-[70] opacity-0 pointer-events-none transition-opacity" onclick="toggleCart()"></div>
+    <aside id="cart-drawer" class="cart-drawer fixed top-0 right-0 h-full w-full max-w-md bg-brand-bg border-l border-brand-border z-[80] flex flex-col">
+        <div class="flex items-center justify-between p-6 border-b border-brand-border">
+            <h3 class="text-lg font-bold">Your Cart</h3>
+            <button onclick="toggleCart()" class="text-brand-mute hover:text-brand-gold transition-colors">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <p class="text-brand-mute text-center py-10">Your cart is empty</p>
+        </div>
+        <div id="cart-footer" class="border-t border-brand-border p-6 hidden">
+            <div class="flex justify-between mb-2">
+                <span class="text-brand-mute text-sm">Subtotal</span>
+                <span id="cart-subtotal" class="font-semibold">R0</span>
+            </div>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="discount-code" placeholder="Discount code" class="flex-1 bg-brand-card border border-brand-border rounded-lg px-4 py-2 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold">
+                <button onclick="applyDiscount()" class="px-4 py-2 border border-brand-gold text-brand-gold rounded-lg text-sm font-medium hover:bg-brand-gold hover:text-brand-bg transition-colors">Apply</button>
+            </div>
+            <button onclick="openCheckout()" class="gold-btn w-full py-3.5 rounded-xl text-brand-bg font-semibold text-sm">
+                Checkout
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== CHECKOUT MODAL ==================== -->
+    <div id="checkout-modal" class="modal-overlay fixed inset-0 z-[90] flex items-center justify-center p-6">
+        <div class="bg-brand-bg border border-brand-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Checkout</h3>
+                <button onclick="closeCheckout()" class="text-brand-mute hover:text-brand-gold">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="placeOrder(event)" class="space-y-4">
+                <input type="text" id="checkout-name" placeholder="Full Name" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                <input type="email" id="checkout-email" placeholder="Email Address" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                <input type="tel" id="checkout-phone" placeholder="Phone Number" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors">
+                <textarea id="checkout-address" placeholder="Delivery Address" rows="3" required class="w-full bg-brand-card border border-brand-border rounded-xl px-4 py-3 text-sm text-brand-text placeholder:text-brand-mute focus:outline-none focus:border-brand-gold transition-colors resize-none"></textarea>
+                <div class="border-t border-brand-border pt-4 mt-4">
+                    <div class="flex justify-between mb-1 text-sm">
+                        <span class="text-brand-mute">Subtotal</span>
+                        <span id="checkout-subtotal">R0</span>
+                    </div>
+                    <div class="flex justify-between mb-1 text-sm">
+                        <span class="text-brand-mute">Shipping</span>
+                        <span id="checkout-shipping">R99</span>
+                    </div>
+                    <div id="checkout-discount-row" class="flex justify-between mb-1 text-sm hidden">
+                        <span class="text-brand-gold">Discount</span>
+                        <span id="checkout-discount" class="text-brand-gold">-R0</span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold mt-3 pt-3 border-t border-brand-border">
+                        <span>Total</span>
+                        <span id="final-total">R0</span>
+                    </div>
+                </div>
+                <button type="submit" class="gold-btn w-full py-4 rounded-xl text-brand-bg font-semibold text-sm tracking-wide mt-4">
+                    Place Order
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script type="text/javascript">
+        /**
+         * Prestige Auto Spa — Store Engine Integration
+         * Powered by VM Embedded Store Engine API
+         */
+
+        // ========================================
+        // CONFIGURATION
+        // ========================================
+        const CONFIG = {
+            API_BASE: 'https://demo-embedded.varsitymarket.tech/store-access',
+            STORE_ID: '5',
+            API_KEY: 'vm_live_6a3251c5acf6b130617899dbeaee9329259bec937181fbc4',
+            STORE_NAME: 'Prestige Auto Spa',
+            CURRENCY: 'R',
+            FREE_SHIPPING_THRESHOLD: 750,
+            SHIPPING_COST: 99
+        };
+
+        // ========================================
+        // API CLIENT
+        // ========================================
+        const api = {
+            _crossOrigin: null,
+            isCrossOrigin() {
+                if (this._crossOrigin === null) {
+                    try {
+                        this._crossOrigin = new URL(CONFIG.API_BASE).origin !== window.location.origin;
+                    } catch { this._crossOrigin = false; }
+                }
+                return this._crossOrigin;
+            },
+            buildUrl(endpoint, params = {}) {
+                let url;
+                if (this.isCrossOrigin()) {
+                    url = new URL('/store-proxy/' + CONFIG.STORE_ID + '/', window.location.origin);
+                    url.searchParams.set('target_base', CONFIG.API_BASE);
+                } else {
+                    url = new URL(CONFIG.API_BASE + '/' + CONFIG.STORE_ID + '/', window.location.origin);
+                }
+                url.searchParams.set('state', endpoint);
+                url.searchParams.set('api_key', CONFIG.API_KEY);
+                Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+                return url.toString();
+            },
+            async get(endpoint, params = {}) {
+                const url = this.buildUrl(endpoint, params);
+                const res = await fetch(url, { headers: { 'X-API-Key': CONFIG.API_KEY } });
+                return res.json();
+            },
+            async post(endpoint, body = {}) {
+                const url = this.buildUrl(endpoint);
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-Key': CONFIG.API_KEY },
+                    body: JSON.stringify(body)
+                });
+                return res.json();
+            },
+            async getProducts(params = {}) {
+                const data = await this.get('products', { limit: '50', ...params });
+                return data.success ? data.data : [];
+            },
+            async getProduct(id) {
+                const data = await this.get('product', { id });
+                return data.success ? data.data : null;
+            },
+            async getCategories() {
+                const data = await this.get('categories');
+                return data.success ? data.data : [];
+            },
+            async searchProducts(query) {
+                const data = await this.get('search', { q: query });
+                return data.success ? data.data : [];
+            },
+            async createCart() {
+                const data = await this.post('cart_create');
+                return data.success ? data.data : null;
+            },
+            async getCart(cartId) {
+                const data = await this.get('cart', { cart_id: cartId });
+                return data.success ? data.data : null;
+            },
+            async addToCart(cartId, productId, quantity = 1) {
+                return this.post('cart_add', { cart_id: cartId, product_id: productId, quantity });
+            },
+            async updateCart(cartId, productId, quantity) {
+                return this.post('cart_update', { cart_id: cartId, product_id: productId, quantity });
+            },
+            async removeFromCart(cartId, productId) {
+                return this.post('cart_remove', { cart_id: cartId, product_id: productId });
+            },
+            async placeOrder(orderData) {
+                return this.post('order', orderData);
+            }
+        };
+
+        // ========================================
+        // STATE
+        // ========================================
+        let PRODUCTS = [];
+        let CATEGORIES = [];
+        let cartData = { items: [], item_count: 0, subtotal: 0 };
+        let cartId = localStorage.getItem('vm_cart_id') || null;
+        let currentDiscount = null;
+        let activeCategory = 'all';
+        let searchTimeout = null;
+
+        // ========================================
+        // SPA ROUTING
+        // ========================================
+        function navigateTo(view) {
+            document.querySelectorAll('[id^="view-"]').forEach(el => {
+                el.classList.add('view-hidden');
+                el.classList.remove('view');
+            });
+            const target = document.getElementById('view-' + view);
+            if (target) {
+                target.classList.remove('view-hidden');
+                target.classList.add('view');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (view === 'store' && PRODUCTS.length === 0) {
+                loadStore();
+            }
+        }
+
+        // ========================================
+        // MOBILE MENU
+        // ========================================
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('open');
+        }
+
+        // ========================================
+        // CART MANAGEMENT
+        // ========================================
+        async function ensureCart() {
+            if (!cartId) {
+                const data = await api.createCart();
+                if (data && data.cart_id) {
+                    cartId = data.cart_id;
+                    localStorage.setItem('vm_cart_id', cartId);
+                }
+            }
+            return cartId;
+        }
+
+        async function refreshCart() {
+            if (!cartId) { renderCart(); updateCartIndicator(); return; }
+            const data = await api.getCart(cartId);
+            if (data) {
+                cartData = data;
+            } else {
+                cartData = { items: [], item_count: 0, subtotal: 0 };
+            }
+            renderCart();
+            updateCartIndicator();
+        }
+
+        function updateCartIndicator() {
+            const badge = document.getElementById('cart-count');
+            const count = cartData.item_count || 0;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        }
+
+        function getImgUrl(p) {
+            if (!p || !p.image) return 'https://placehold.co/400x400/1A1A1A/C9A96E?text=No+Image';
+            if (p.image.startsWith('http')) return p.image;
+            return CONFIG.API_BASE.replace('/store-access', '') + '/' + p.image;
+        }
+
+        // ========================================
+        // STORE LOADING
+        // ========================================
+        async function loadStore() {
+            try {
+                const [products, categories] = await Promise.all([
+                    api.getProducts(),
+                    api.getCategories()
+                ]);
+                PRODUCTS = products;
+                CATEGORIES = categories;
+                renderCategories();
+                renderProducts(PRODUCTS);
+            } catch (e) {
+                document.getElementById('products-grid').innerHTML = '<p class="col-span-full text-center py-20 text-brand-mute">Unable to load products. Please try again later.</p>';
+            }
+        }
+
+        // ========================================
+        // RENDER FUNCTIONS
+        // ========================================
+        function renderCategories() {
+            const bar = document.getElementById('categories-bar');
+            let html = '<button onclick="filterCategory(\'all\')" class="cat-btn px-5 py-2 rounded-full text-sm font-medium border whitespace-nowrap transition-all bg-brand-gold text-brand-bg border-brand-gold">All</button>';
+            CATEGORIES.forEach(cat => {
+                html += `<button onclick="filterCategory('${cat.id}')" class="cat-btn px-5 py-2 rounded-full text-sm font-medium border border-brand-border text-brand-mute whitespace-nowrap transition-all hover:border-brand-gold hover:text-brand-gold">${cat.name}</button>`;
+            });
+            bar.innerHTML = html;
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('products-grid');
+            if (!products || products.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center py-20 text-brand-mute">No products found.</p>';
+                return;
+            }
+            grid.innerHTML = products.map(p => `
+                <div class="bg-brand-card border border-brand-border rounded-2xl overflow-hidden cursor-pointer group transition-all hover:border-brand-gold" onclick="viewProduct('${p.id}')">
+                    <div class="aspect-square overflow-hidden">
+                        <img src="${getImgUrl(p)}" alt="${p.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="p-4">
+                        <h4 class="text-sm font-semibold truncate">${p.name}</h4>
+                        <p class="text-brand-gold font-bold mt-1">${CONFIG.CURRENCY}${parseFloat(p.price).toFixed(0)}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const footer = document.getElementById('cart-footer');
+
+            if (!cartData.items || cartData.items.length === 0) {
+                container.innerHTML = '<p class="text-brand-mute text-center py-10">Your cart is empty</p>';
+                footer.classList.add('hidden');
+                return;
+            }
+
+            footer.classList.remove('hidden');
+            document.getElementById('cart-subtotal').textContent = CONFIG.CURRENCY + parseFloat(cartData.subtotal).toFixed(0);
+
+            container.innerHTML = cartData.items.map(item => `
+                <div class="flex gap-4 items-center">
+                    <img src="${getImgUrl(item)}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold truncate">${item.name}</p>
+                        <p class="text-brand-gold text-sm">${CONFIG.CURRENCY}${parseFloat(item.price).toFixed(0)}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <button onclick="updateCartItem('${item.product_id}', ${item.quantity - 1})" class="w-6 h-6 rounded bg-brand-border text-xs flex items-center justify-center hover:bg-brand-gold hover:text-brand-bg transition-colors">-</button>
+                            <span class="text-xs">${item.quantity}</span>
+                            <button onclick="updateCartItem('${item.product_id}', ${item.quantity + 1})" class="w-6 h-6 rounded bg-brand-border text-xs flex items-center justify-center hover:bg-brand-gold hover:text-brand-bg transition-colors">+</button>
+                        </div>
+                    </div>
+                    <button onclick="removeCartItem('${item.product_id}')" class="text-brand-mute hover:text-red-400 transition-colors">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // ========================================
+        // PRODUCT DETAIL
+        // ========================================
+        async function viewProduct(id) {
+            const product = await api.getProduct(id);
+            if (!product) return;
+
+            const detail = document.getElementById('product-detail');
+            detail.innerHTML = `
+                <div class="rounded-2xl overflow-hidden aspect-square">
+                    <img src="${getImgUrl(product)}" alt="${product.name}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-center">
+                    <h1 class="text-3xl font-bold mb-2">${product.name}</h1>
+                    <p class="text-brand-gold text-2xl font-bold mb-4">${CONFIG.CURRENCY}${parseFloat(product.price).toFixed(0)}</p>
+                    <p class="text-brand-mute leading-relaxed mb-8">${product.description || 'Premium quality product from our curated collection.'}</p>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center border border-brand-border rounded-lg overflow-hidden">
+                            <button onclick="adjustPdpQty(-1)" class="px-4 py-3 text-brand-mute hover:text-brand-gold transition-colors">-</button>
+                            <span id="pdp-qty" class="px-4 py-3 text-sm font-semibold">1</span>
+                            <button onclick="adjustPdpQty(1)" class="px-4 py-3 text-brand-mute hover:text-brand-gold transition-colors">+</button>
+                        </div>
+                        <button onclick="addProductToCart('${product.id}')" class="gold-btn flex-1 py-3.5 rounded-xl text-brand-bg font-semibold text-sm">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+            window._pdpQty = 1;
+            navigateTo('product');
+        }
+
+        function adjustPdpQty(delta) {
+            window._pdpQty = Math.max(1, (window._pdpQty || 1) + delta);
+            document.getElementById('pdp-qty').textContent = window._pdpQty;
+        }
+
+        // ========================================
+        // CART ACTIONS
+        // ========================================
+        async function addProductToCart(productId) {
+            await ensureCart();
+            await api.addToCart(cartId, productId, window._pdpQty || 1);
+            await refreshCart();
+            toggleCart();
+        }
+
+        async function updateCartItem(productId, quantity) {
+            if (quantity <= 0) return removeCartItem(productId);
+            await api.updateCart(cartId, productId, quantity);
+            await refreshCart();
+        }
+
+        async function removeCartItem(productId) {
+            await api.removeFromCart(cartId, productId);
+            await refreshCart();
+        }
+
+        // ========================================
+        // FILTERING & SEARCH
+        // ========================================
+        function filterCategory(catId) {
+            activeCategory = catId;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-gold', 'text-brand-bg', 'border-brand-gold');
+                btn.classList.add('border-brand-border', 'text-brand-mute');
+            });
+            event.target.classList.add('bg-brand-gold', 'text-brand-bg', 'border-brand-gold');
+            event.target.classList.remove('border-brand-border', 'text-brand-mute');
+
+            if (catId === 'all') {
+                renderProducts(PRODUCTS);
+            } else {
+                renderProducts(PRODUCTS.filter(p => p.category_id === catId));
+            }
+        }
+
+        function handleSearch(query) {
+            clearTimeout(searchTimeout);
+            if (!query.trim()) {
+                renderProducts(PRODUCTS);
+                return;
+            }
+            searchTimeout = setTimeout(async () => {
+                const results = await api.searchProducts(query);
+                renderProducts(results);
+            }, 400);
+        }
+
+        // ========================================
+        // CART UI
+        // ========================================
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('opacity-0');
+            overlay.classList.toggle('pointer-events-none');
+        }
+
+        // ========================================
+        // DISCOUNT
+        // ========================================
+        function applyDiscount() {
+            const code = document.getElementById('discount-code').value.toUpperCase();
+            if (code === 'VIP20') {
+                currentDiscount = { code: 'VIP20', percent: 20 };
+                alert('Discount applied: 20% off');
+            } else if (code === 'WELCOME') {
+                currentDiscount = { code: 'WELCOME', percent: 10 };
+                alert('Discount applied: 10% off');
+            } else {
+                alert('Invalid or expired discount code.');
+                return;
+            }
+            renderCart();
+        }
+
+        // ========================================
+        // CHECKOUT
+        // ========================================
+        function calculateTotal() {
+            let subtotal = parseFloat(cartData.subtotal) || 0;
+            let shipping = subtotal >= CONFIG.FREE_SHIPPING_THRESHOLD ? 0 : CONFIG.SHIPPING_COST;
+            let discount = 0;
+            if (currentDiscount) {
+                discount = subtotal * (currentDiscount.percent / 100);
+            }
+            return CONFIG.CURRENCY + (subtotal + shipping - discount).toFixed(0);
+        }
+
+        function openCheckout() {
+            if (!cartData.items || cartData.items.length === 0) return alert('Your cart is empty.');
+            const subtotal = parseFloat(cartData.subtotal) || 0;
+            const shipping = subtotal >= CONFIG.FREE_SHIPPING_THRESHOLD ? 0 : CONFIG.SHIPPING_COST;
+            const discount = currentDiscount ? subtotal * (currentDiscount.percent / 100) : 0;
+
+            document.getElementById('checkout-subtotal').textContent = CONFIG.CURRENCY + subtotal.toFixed(0);
+            document.getElementById('checkout-shipping').textContent = shipping === 0 ? 'FREE' : CONFIG.CURRENCY + shipping;
+
+            if (currentDiscount) {
+                document.getElementById('checkout-discount-row').classList.remove('hidden');
+                document.getElementById('checkout-discount').textContent = '-' + CONFIG.CURRENCY + discount.toFixed(0);
+            }
+
+            document.getElementById('final-total').textContent = CONFIG.CURRENCY + (subtotal + shipping - discount).toFixed(0);
+            document.getElementById('checkout-modal').classList.add('open');
+            toggleCart();
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.remove('open');
+        }
+
+        async function placeOrder(e) {
+            e.preventDefault();
+            const orderData = {
+                cart_id: cartId,
+                customer_name: document.getElementById('checkout-name').value,
+                customer_email: document.getElementById('checkout-email').value,
+                customer_phone: document.getElementById('checkout-phone').value,
+                shipping_address: document.getElementById('checkout-address').value,
+                discount_code: currentDiscount ? currentDiscount.code : null
+            };
+
+            const result = await api.placeOrder(orderData);
+            if (result.success) {
+                alert('Order placed successfully! We will contact you with delivery details.');
+                cartId = null;
+                localStorage.removeItem('vm_cart_id');
+                cartData = { items: [], item_count: 0, subtotal: 0 };
+                currentDiscount = null;
+                renderCart();
+                updateCartIndicator();
+                closeCheckout();
+                navigateTo('home');
+            } else {
+                alert('Something went wrong. Please try again.');
+            }
+        }
+
+        // ========================================
+        // CONTACT FORM
+        // ========================================
+        function handleContact(e) {
+            e.preventDefault();
+            alert('Thank you! We will get back to you shortly to confirm your booking.');
+            e.target.reset();
+        }
+
+        // ========================================
+        // INIT
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshCart();
+        });
+    </script>
+</body>
+
+</html>
